@@ -7,6 +7,11 @@ The app has one command, `hello`, which greets you by name. If you don't pass `-
 ## Demo
 
 ![demo](./demo.svg)
+<!-- Created using `
+asciinema rec -f asciicast-v2 demo.cast --overwrite
+svg-term --in demo.cast --out demo.svg
+` -->
+
 
 ```bash
 $ ink-cli-demo hello --name Ada

@@ -10,43 +10,21 @@
 
 
 import "bun";
-import { useObservable } from "@slimr/react-util";
-import { Box, Text, render, useApp, useInput } from "ink";
+import { Select } from "@inkjs/ui";
+import { Box, Text, render, useApp } from "ink";
 import { useState, useEffect } from "react";
 import { cliRun, type CliCommand, CliOptionKind, CliFallbackMode } from "argsbarg";
 
+const NAMES = ["Ada", "Bob", "Chen", "Dana"] as const;
+const NAME_OPTIONS = NAMES.map((name) => ({ label: name, value: name }));
 
 class HelloHandler {
     /** Interactive terminal list: user navigates with ↑/↓ and confirms with Enter. */
     private static NamePicker({ onName }: { onName: (name: string) => void }) {
-        const NAMES = ["Ada", "Bob", "Chen", "Dana"] as const;
-        const highlightedRow = useObservable(0);
-
-        useInput((_input, key) => {
-            if (key.upArrow) {
-            highlightedRow.value =
-                highlightedRow.value > 0 ? highlightedRow.value - 1 : NAMES.length - 1;
-            } else if (key.downArrow) {
-            highlightedRow.value =
-                highlightedRow.value < NAMES.length - 1 ? highlightedRow.value + 1 : 0;
-            } else if (key.return) {
-            onName(NAMES[highlightedRow.value]!);
-            }
-        });
-
         return (
             <Box flexDirection="column">
-            <Text>Pick a name  ↑/↓  Enter to confirm</Text>
-            <Box flexDirection="column">
-                {NAMES.map((name, rowIndex) => (
-                <Text
-                    key={name}
-                    color={rowIndex === highlightedRow.value ? "cyan" : undefined}
-                >
-                    {rowIndex === highlightedRow.value ? `> ${name}` : `  ${name}`}
-                </Text>
-                ))}
-            </Box>
+                <Text>Pick a name</Text>
+                <Select options={NAME_OPTIONS} onChange={onName} />
             </Box>
         );
     }
