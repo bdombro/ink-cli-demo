@@ -1,0 +1,23 @@
+{
+  "name": "ink-cli-demo",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "//justfile": "use justfile for common tasks"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.2.0",
+    "react-devtools-core": "^7.0.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@slimr/react-util": "^1.0.1",
+    "argsbarg": "^1.1.1",
+    "ink": "^7.0.1",
+    "react": "^19.2.0"
+  }
+}

@@ -1,0 +1,15 @@
+---
+description: JSDoc + clear names for src TypeScript (see body).
+globs: "src/**/*.ts, src/**/*.tsx"
+alwaysApply: true
+---
+
+## JSDoc
+
+Put `/** … */` above: **functions** (incl. components, handlers), **classes** (and their public methods), and **top-level const config** (schemas, option lists, shared object literals). Use `@param` / `@returns` when non-obvious. One-line JSDoc is fine for trivial exports.
+
+**Skip** JSDoc on tiny anonymous bits (e.g. short `test(…, () => { expect })` bodies) when the test title is enough; one line is enough for pure re-export barrels.
+
+## Names
+
+Prefer **domain-specific** identifiers over vague ones (`data`, `result`, `item`, `tmp`, `handler`, `index` when a narrower role exists, etc.). OK in **very small** scopes (tight loop, simple `.map`). Names from **libraries** are fine; rename when you **keep** the value in your own variable or state.

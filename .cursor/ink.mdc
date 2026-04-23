@@ -1,0 +1,86 @@
+---
+description: Ink v7 (React for CLIs) — API and patterns summarized from the read-only ./ink clone; use before diving into upstream source.
+globs: "**/*.ts, **/*.tsx"
+alwaysApply: false
+---
+
+## Scope
+
+This file summarizes **[Ink](https://github.com/vadimdemedes/ink)** as vendored in the repo’s **`ink/`** directory (reference clone — **do not edit**; see `docs/architecture.md`). It reflects the **`ink`** npm dependency version aligned with that tree (currently **7.x**).
+
+Authoritative long-form docs: **`ink/readme.md`**. Public types and exports: **`ink/src/index.ts`** and built **`ink/build/`** after `npm run build` inside `ink/`.
+
+## Mental model
+
+- Ink is a **custom React renderer** for the terminal, not DOM. Normal **React** rules (hooks, state, effects) apply; layout uses **Yoga** (Flexbox-like props on **`Box`**).
+- One **`render()`** call mounts a tree and drives stdout; **one live Ink instance per `stdout`** until **`unmount()`**.
+
+## Install shape (for this repo)
+
+- **`ink`** is the library; you also need **`react`** and, for TypeScript, **`@types/react`** (Ink’s peers: React **≥ 19.2** per upstream `package.json`).
+- Upstream declares **`engines.node: ">=22"`** for the Ink package itself; **ink-cli-demo** runs on **Bun** — verify behavior; do not assume every Ink dev script works under Bun without checking.
+
+## `render(element, options?)` → `Instance`
+
+```tsx
+import {render, Text} from 'ink';
+
+const inst = render(<Text>Hi</Text>, {/* optional RenderOptions */});
+// inst.rerender(<Text>Bye</Text>);
+// inst.unmount();
+// await inst.waitUntilExit();
+```
+
+**`Instance`** (from `render`): **`rerender`**, **`unmount`**, **`waitUntilExit()`** (promise settles on exit; resolves with value passed to **`exit()`** or rejects with passed **`Error`**), **`waitUntilRenderFlush()`**, **`cleanup()`**, **`clear()`**.
+
+**Notable `RenderOptions`:** `stdout` / `stdin` / `stderr` streams; **`debug`** (append frames instead of replace); **`exitOnCtrlC`**; **`patchConsole`**; **`onRender`**; **`isScreenReaderEnabled`** (or `INK_SCREEN_READER=true`); **`maxFps`**; **`incrementalRendering`**; **`concurrent`** (React concurrent mode — affects timing, tests may need `act()`); **`kittyKeyboard`**; **`interactive`** (auto false in CI / non-TTY); **`alternateScreen`**.
+
+**Caveat:** Calling **`render()`** again on the **same `stdout`** before **`unmount()`** is unsupported (Ink warns and reuses instance).
+
+## `useApp()` — lifecycle
+
+From **`useApp()`**: **`exit(errorOrResult?)`** — unmount; `exit()` → `waitUntilExit()` resolves `undefined`; `exit(err)` rejects; `exit(value)` resolves with `value`. Also **`waitUntilRenderFlush()`** after frames commit (see upstream JSDoc).
+
+## Core components (from `ink`)
+
+| Export | Role |
+|--------|------|
+| **`Text`** | Styled string output (e.g. `color`, `bold`); main leaf for text. |
+| **`Box`** | Flex container (`flexDirection`, `justifyContent`, padding/margin, borders, etc.) — primary layout primitive. |
+| **`Static`** | Append-only / “log” region; items typically `key`ed; useful for completed lines above a live UI. |
+| **`Newline`**, **`Spacer`** | Layout helpers. |
+| **`Transform`** | Wrap children to transform output per line. |
+
+**Accessibility:** **`Box`** supports `aria-*` props when screen reader mode is on (see readme).
+
+## Hooks (common)
+
+| Hook | Use |
+|------|-----|
+| **`useInput`** | Keyboard input handler; receives input string and **`Key`** metadata (arrows, ctrl, meta, kitty extras when enabled). |
+| **`usePaste`** | Bracketed paste / paste events. |
+| **`useStdin` / `useStdout` / `useStderr`** | Access streams and TTY metadata (`isTTY`, etc.). |
+| **`useFocus` / `useFocusManager`** | Focus order for interactive widgets. |
+| **`useCursor`** | Show/hide terminal cursor. |
+| **`useWindowSize`** | Terminal columns/rows. |
+| **`useBoxMetrics`** | Measure layout box for a ref. |
+| **`useAnimation`** | Time-based animation helper. |
+| **`useIsScreenReaderEnabled`** | Whether a11y mode is active. |
+
+## `renderToString(element, {columns?})`
+
+Synchronous string output **without** a terminal session. **`useInput`**, **`useStdin`**, **`useStdout`**, **`useStderr`**, **`useApp`**, **`useFocus`**, **`useFocusManager`** are **no-ops** (do not throw). **`useEffect`** state updates do **not** affect returned string; **`useLayoutEffect`** updates **do**. **`<Static>`** output is prepended to dynamic output. Throws propagate after cleanup.
+
+## Other exports
+
+- **`measureElement`** — measure a laid-out element.
+- **`kittyFlags`**, **`kittyModifiers`**, types from **`kitty-keyboard`** — Kitty keyboard protocol helpers.
+
+## Testing and devtools
+
+- Component tests: community **`ink-testing-library`** (`lastFrame()`, etc.) — see **`ink/readme.md` § Testing**.
+- React DevTools: optional **`react-devtools-core`**, run with **`DEV=true`**, see readme § Using React Devtools.
+
+## When to open `./ink` source
+
+Use **`ink/readme.md`** for props tables, recipes, and edge cases. Open **`ink/src/components/*`** or **`ink/src/hooks/*`** when you need exact prop types or hook option shapes beyond this cheat sheet.

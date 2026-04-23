@@ -1,0 +1,28 @@
+---
+description: README for end users; docs/architecture.md for maintainers; context.mdc for Cursor when those change.
+alwaysApply: true
+---
+
+## `README.md`
+
+Use **`README.md`** for **people who use the tool**: what it does, how to install it, how to run it, and **what it can do** (commands, flags, and behavior they depend on).
+
+Whenever you **add, change, or remove** something users can see or rely on, **update `README.md` in the same change** so it stays true. Keep implementation deep-dives out of the README.
+
+## `docs/architecture.md`
+
+Use **`docs/architecture.md`** for **people who work on the codebase**: architecture, main modules, data flow, design decisions, and notes on build and test setup.
+
+When the **internal shape** of the project changes in a way maintainers need to know, **update this file**. Create the `docs/` folder and `architecture.md` the first time you need them.
+
+## `.cursor/context.mdc`
+
+Update **`.cursor/context.mdc`** when **features** or **architecture** change enough that future sessions should know (for example: new stack pieces, new entrypoints, new workflows). Keep it **short**; put long explanations in `docs/architecture.md` instead.
+
+## How the three fit together
+
+- **Users** → `README.md`
+- **Contributors / internals** → `docs/architecture.md`
+- **Cursor context** → `.cursor/context.mdc`
+
+Avoid copying the same long technical section into more than one place. A short summary in the README with a pointer to `docs/architecture.md` is enough when users might want a link to deeper detail.

@@ -1,0 +1,74 @@
+---
+description: argsbarg (Bun CLI schema/parser) — API and patterns from the read-only bun-argsbarg symlink; use before reading all of ./bun-argsbarg.
+globs: "**/*.ts, **/*.tsx"
+alwaysApply: false
+---
+
+## Scope
+
+This summarizes the npm package **[argsbarg](https://www.npmjs.com/package/argsbarg)** (`"name": "argsbarg"`), aligned with the **`bun-argsbarg/`** symlink (→ `../bun-argsbarg`). That tree is **reference-only** — **do not edit**; see `docs/architecture.md`.
+
+Authoritative docs: **`bun-argsbarg/readme.md`**. Public barrel: **`bun-argsbarg/src/index.ts`** (re-exports from `context.ts`, `runtime.ts`, `types.ts`).
+
+## Mental model
+
+- **Schema-first:** you build a tree of **`CliCommand`** objects (`key`, `description`, `options`, `positionals`, nested **`commands`**, leaf **`handler`**).
+- **`cliRun(root, argv?)`** validates the tree, parses argv (default **`process.argv.slice(2)`**), prints help/errors or runs **`completion`**, invokes the matched leaf handler, then **`process.exit`** (never returns a usable value to callers — typed **`Promise<never>`**).
+- **Bun-oriented**, no third-party runtime deps in the library itself; **ink-cli-demo** depends on **`argsbarg`** from npm — do not import from **`bun-argsbarg/`** in app code.
+
+## Program root (`CliCommand` passed to `cliRun`)
+
+- **`key`** — binary / app name (help, completions).
+- **`commands`** — top-level subcommands; **`options`** — global flags.
+- **Root must not** set **`handler`** or **`positionals`** (validated at startup).
+- **`fallbackCommand`** + **`fallbackMode`** — only on the **root**, for default routing when argv omits or mismatches a subcommand (see table below).
+
+## Option and positional model
+
+- **`CliOption`:** `name`, `description`, **`kind`:** **`CliOptionKind.Presence` | `String` | `Number`**, optional **`shortName`** (single letter for **`-x`**).
+- Bundled shorts (**`-abc`**) supported for presence flags.
+- **`CliPositional`:** ordered slots with `name`, `description`, `kind`, optional **`argMin`** / **`argMax`** (`argMax: 0` = varargs tail; must be last). Help label rules are summarized in **`bun-argsbarg/readme.md`** (tables for `<n>`, `[n]`, etc.).
+
+## `CliFallbackMode` (root only)
+
+| Mode | Empty argv | Unknown first token |
+|------|------------|---------------------|
+| **`MissingOnly`** | default command | error |
+| **`MissingOrUnknown`** | default command | default command (token fed into default) |
+| **`UnknownOnly`** | root help (exit 1) | default command |
+
+With **`MissingOrUnknown`** / **`UnknownOnly`**, unrecognized **root** flags can stop root-flag parsing; remainder goes to the default command (see readme).
+
+## `CliContext` (leaf handlers)
+
+| API | Role |
+|-----|------|
+| **`hasFlag(name)`** | Presence option set (including implicit `"1"`). |
+| **`stringOpt(name)`** | `string \| undefined`. |
+| **`numberOpt(name)`** | Strict double string → **`number \| null`**. |
+| **`typedOpt<T>(name, parse)`** | Custom parse; **`T \| null`** on failure. |
+| **`args`** | Positional words in order (`string[]`). |
+| **`commandPath`**, **`appName`**, **`schema`** | Routing and merged root schema (e.g. for help). |
+
+Some readme examples use **`ctx.flag`**; the implementation in **`CliContext`** is **`hasFlag`** — prefer **`hasFlag`** unless a future export adds an alias.
+
+## Runtime exports (`src/index.ts`)
+
+| Symbol | Role |
+|--------|------|
+| **`cliRun(root, argv?)`** | Validate, parse, dispatch, **`process.exit`**. |
+| **`cliErrWithHelp(ctx, msg)`** | Stderr error line + scoped help, exit **1**. |
+| **`CliCommand`**, **`CliOption`**, **`CliPositional`**, **`CliHandler`** | Schema types. |
+| **`CliOptionKind`**, **`CliFallbackMode`** | Enums. |
+| **`CliSchemaValidationError`** | Invalid static schema. |
+| **`CliContext`** | Handler context class. |
+
+## Built-ins (injected by `cliRun`)
+
+- **`-h` / `--help`** at any routing depth (scoped help; exit code depends on implicit vs explicit help — see readme / runtime).
+- **`completion bash`** and **`completion zsh`** — print completion scripts to stdout.
+- Do **not** declare a user command whose **`key`** is **`completion`** at the root — reserved.
+
+## When to open `./bun-argsbarg`
+
+Use **`bun-argsbarg/readme.md`** for exit codes, completion install snippets, and edge cases. Open **`bun-argsbarg/src/*.ts`** (e.g. **`parse.ts`**, **`validate.ts`**) for parse/validation details beyond this sheet.

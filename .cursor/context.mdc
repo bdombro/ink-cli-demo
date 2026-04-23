@@ -1,0 +1,61 @@
+---
+description: Agent-oriented project summary for ink-cli-demo (stack, layout, commands, rules).
+alwaysApply: true
+---
+
+## What this is
+
+**ink-cli-demo** is a private TypeScript CLI. It uses **Bun** to run, install dependencies, run tests, and build. The program entry is **`src/index.ts`**. It uses **argsbarg** for argv/routing and **Ink** + **React** for an interactive **name picker** when `hello` runs without `-n` (see `src/pages/hello/name-picker.tsx`).
+
+## Stack and layout
+
+- **Modules:** ESM (`"type": "module"` in `package.json`).
+- **Entrypoint:** `src/index.ts` (`package.json` `"module"`).
+- **Tests:** Bun’s test runner (`bun:test`), colocated `*.test.ts` under **`src/`** (see `src/index.test.ts`).
+- **Typechecking:** `bunx tsc --noEmit`, also as **`just typecheck`**. **`tsconfig.json`** is the config for Bun/IDE.
+- **Developer tasks:** the root **`justfile`**. Prefer running **`just <recipe>`** instead of inventing one-off shell commands when a recipe already exists.
+
+Important paths:
+
+| Path | Purpose |
+|------|---------|
+| `src/index.tsx` | CLI entry (`just run` or `bun ./src/index.tsx`) |
+| `src/**/*.test.ts` | Tests |
+| `justfile` | `install`, `run`, `dev`, `test`, `typecheck`, `check`, `build` |
+| `package.json` | Package name and dependencies |
+| `tsconfig.json` | TS config |
+| `src/pages/hello/` | Hello component and interactive name picker |
+| `.cursor/ink.mdc` | Condensed Ink API and patterns |
+| `.cursor/argsbarg.mdc` | Condensed **argsbarg** schema / `cliRun` patterns |
+| `.cursor/rules/docs.mdc` | Where README and this file should go |
+| `.cursor/rules/use-bun-instead-of-node-vite-npm-pnpm.mdc` | Prefer Bun over Node / npm / pnpm |
+
+## Commands
+
+From the repository root, after [just](https://github.com/casey/just) is installed:
+
+```bash
+just              # list recipes (default)
+just install
+just run          # runs src/index.ts
+just dev          # same, with --watch
+just test          # bun test ./src (avoids symlinked reference trees)
+just typecheck
+just check        # typecheck, then test
+just build        # standalone binary → dist/ink-cli-demo
+```
+
+To pass flags to **the app** (not to `just`), put **`--`** before them, for example: `just run -- --help`.
+
+## Rules for agents
+
+- **Must** use Bun for this project (`bun`, `bunx`, `bun test`). Do not switch to Node- or npm-first workflows unless the user asks.
+- **Must not** add `dotenv`; Bun loads `.env` when appropriate.
+- **Should** keep changes small and consistent with existing **`src/`** code and test style.
+- **Should** update **`README.md`** and **this file** when features or architecture change, as described in `.cursor/rules/docs.mdc`.
+
+## Where documentation lives
+
+- **End users** read **`README.md`** (features and how to use the tool).
+- **Developers** read **`APP_DESCRIPTION.md`** (architecture and design rationale).
+- **This file** is a short, current summary for people and agents working in Cursor. Do not paste long specs here.
