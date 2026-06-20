@@ -1,12 +1,12 @@
 #!/usr/bin/env bun
 /** CLI entry: argsbarg routing; renders Hello component with optional --name and --verbose flags. */
 
-import { cliRun, type CliCommand, CliOptionKind, CliFallbackMode } from "argsbarg";
+import { cliRun, type CliProgram, CliOptionKind, CliFallbackMode } from "argsbarg";
 import { render } from "ink";
 import { Hello } from "./pages/hello";
 
 /** Argsbarg program root: app id, default subcommand, and the `hello` command tree. */
-const cli: CliCommand = {
+const cli = {
   key: "ink-cli-demo",
   description: "Tiny demo.",
   commands: [
@@ -34,6 +34,6 @@ const cli: CliCommand = {
   ],
   fallbackCommand: "hello",
   fallbackMode: CliFallbackMode.MissingOrUnknown,
-};
+} satisfies CliProgram;
 
 await cliRun(cli);

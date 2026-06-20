@@ -7,7 +7,7 @@
       "dependencies": {
         "@inkjs/ui": "^2.0.0",
         "@slimr/react-util": "^1.0.1",
-        "argsbarg": "^1.1.1",
+        "argsbarg": "^2.1.0",
         "ink": "^7.0.1",
         "react": "^19.2.0",
       },
@@ -44,7 +44,7 @@
 
     "ansi-styles": ["ansi-styles@6.2.3", "", {}, "sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg=="],
 
-    "argsbarg": ["argsbarg@1.1.1", "", { "bin": { "argsbarg": "src/index.ts" } }, "sha512-UMhXZ6toaz2nHhmiKe2RrhROT/lh4W6RzCOgoqSmCBEpRBRn1SrGhoYw4V1KBIDs2MU8GBiJqg9lo1suv4kDLQ=="],
+    "argsbarg": ["argsbarg@2.1.0", "", { "bin": { "argsbarg": "src/index.ts" } }, "sha512-HWOp700SPs/DkhJg9ImemVZ1mKeRnWr6Vbhedi303u0iVOtYmEBv7+AHUFaYS7IvEXsWRWnssBHrNNAtg04a6w=="],
 
     "auto-bind": ["auto-bind@5.0.1", "", {}, "sha512-ooviqdwwgfIfNmDwo94wlshcdzfO64XV0Cg6oDsDYBJfITDz1EngD2z7DkbvCWn+XIMsIqW27sEVF6qcpJrRcg=="],
 

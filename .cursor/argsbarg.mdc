@@ -12,11 +12,11 @@ Authoritative docs: **`bun-argsbarg/readme.md`**. Public barrel: **`bun-argsbarg
 
 ## Mental model
 
-- **Schema-first:** you build a tree of **`CliCommand`** objects (`key`, `description`, `options`, `positionals`, nested **`commands`**, leaf **`handler`**).
+- **Schema-first:** you build a tree of **`CliProgram`** objects (`key`, `description`, `options`, `positionals`, nested **`commands`**, leaf **`handler`**).
 - **`cliRun(root, argv?)`** validates the tree, parses argv (default **`process.argv.slice(2)`**), prints help/errors or runs **`completion`**, invokes the matched leaf handler, then **`process.exit`** (never returns a usable value to callers — typed **`Promise<never>`**).
 - **Bun-oriented**, no third-party runtime deps in the library itself; **ink-cli-demo** depends on **`argsbarg`** from npm — do not import from **`bun-argsbarg/`** in app code.
 
-## Program root (`CliCommand` passed to `cliRun`)
+## Program root (`CliProgram` passed to `cliRun`)
 
 - **`key`** — binary / app name (help, completions).
 - **`commands`** — top-level subcommands; **`options`** — global flags.
@@ -58,7 +58,7 @@ Some readme examples use **`ctx.flag`**; the implementation in **`CliContext`** 
 |--------|------|
 | **`cliRun(root, argv?)`** | Validate, parse, dispatch, **`process.exit`**. |
 | **`cliErrWithHelp(ctx, msg)`** | Stderr error line + scoped help, exit **1**. |
-| **`CliCommand`**, **`CliOption`**, **`CliPositional`**, **`CliHandler`** | Schema types. |
+| **`CliProgram`**, **`CliOption`**, **`CliPositional`**, **`CliHandler`** | Schema types. |
 | **`CliOptionKind`**, **`CliFallbackMode`** | Enums. |
 | **`CliSchemaValidationError`** | Invalid static schema. |
 | **`CliContext`** | Handler context class. |

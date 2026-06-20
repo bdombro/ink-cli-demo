@@ -13,7 +13,7 @@ import "bun";
 import { Select } from "@inkjs/ui";
 import { Box, Text, render, useApp } from "ink";
 import { useState, useEffect } from "react";
-import { cliRun, type CliCommand, CliOptionKind, CliFallbackMode } from "argsbarg";
+import { cliRun, type CliProgram, CliOptionKind, CliFallbackMode } from "argsbarg";
 
 const NAMES = ["Ada", "Bob", "Chen", "Dana"] as const;
 const NAME_OPTIONS = NAMES.map((name) => ({ label: name, value: name }));
@@ -53,7 +53,7 @@ class HelloHandler {
 }
 
 /** Argsbarg program root: app id, default subcommand, and the `hello` command tree. */
-const cli: CliCommand = {
+const cli = {
   key: "ink-cli-demo-single-file.tsx",
   description: "Tiny demo.",
   commands: [
@@ -81,6 +81,6 @@ const cli: CliCommand = {
   ],
   fallbackCommand: "hello",
   fallbackMode: CliFallbackMode.MissingOrUnknown,
-};
+} satisfies CliProgram;
 
 await cliRun(cli);
